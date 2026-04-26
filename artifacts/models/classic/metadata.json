@@ -1,0 +1,7 @@
+{
+  "model_name": "grid_lr_C0.5_cwbalanced",
+  "test_f1_macro": 0.714464144393196,
+  "fit_seconds": 4.211496400001124,
+  "infer_seconds_test_set": 0.3020699999997305,
+  "seed": 42
+}

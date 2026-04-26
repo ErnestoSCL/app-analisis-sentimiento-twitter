@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+outputs/
+Tweets.csv
+*.log
+
+# Large model artifacts (keep metadata/config only)
+artifacts/models/transformer/twitter_roberta_finetuned/model.safetensors
+artifacts/models/transformer/twitter_roberta_finetuned/training_args.bin
+artifacts/models/transformer/twitter_roberta_finetuned/tokenizer.json
+
+# Local UI exports
+ui_prediction_history.csv

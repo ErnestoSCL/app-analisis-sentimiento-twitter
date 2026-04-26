@@ -1,0 +1,8 @@
+{
+  "model_name": "twitter_roberta_finetuned",
+  "base_model": "cardiffnlp/twitter-roberta-base-sentiment-latest",
+  "test_f1_macro": 0.8049685343977434,
+  "fit_seconds": 126.7696388000004,
+  "infer_seconds_test_set": 2.8712821999997686,
+  "seed": 42
+}

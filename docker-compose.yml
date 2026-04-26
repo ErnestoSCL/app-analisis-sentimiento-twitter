@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: twitter-sentiment-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: sentiment_app
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  api:
+    build: .
+    container_name: twitter-sentiment-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://app_user:app_password@db:3306/sentiment_app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    depends_on:
+      - db
+
+  ui:
+    build: .
+    container_name: twitter-sentiment-ui
+    ports:
+      - "7860:7860"
+    environment:
+      - API_BASE_URL=http://api:8000
+    command: python ui/gradio_app.py
+    depends_on:
+      - api
+
+volumes:
+  mysql_data:
