@@ -14,7 +14,9 @@ services:
       - mysql_data:/var/lib/mysql
 
   api:
-    build: .
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
     container_name: twitter-sentiment-api
     ports:
       - "8000:8000"
@@ -25,7 +27,9 @@ services:
       - db
 
   ui:
-    build: .
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
     container_name: twitter-sentiment-ui
     ports:
       - "7860:7860"
