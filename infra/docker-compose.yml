@@ -12,6 +12,12 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "app_user", "-papp_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   api:
     build:
@@ -24,7 +30,8 @@ services:
       - DATABASE_URL=mysql+pymysql://app_user:app_password@db:3306/sentiment_app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   ui:
     build:
@@ -37,7 +44,8 @@ services:
       - API_BASE_URL=http://api:8000
     command: python ui/gradio_app.py
     depends_on:
-      - api
+      api:
+        condition: service_started
 
 volumes:
   mysql_data:

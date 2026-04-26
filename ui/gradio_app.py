@@ -216,7 +216,7 @@ def batch_error_analysis(file_obj):
 
 
 THEME_CSS = """
-.gradio-container {max-width: 1200px !important; margin: 0 auto !important;}
+.gradio-container {max-width: 98% !important; width: 98% !important; margin: 0 auto !important; padding: 0 1% !important;}
 """
 
 
@@ -225,7 +225,7 @@ with gr.Blocks(theme=gr.themes.Soft(), css=THEME_CSS, title="Twitter Sentiment H
     gr.Markdown("**Tagline:** FastAPI + Hybrid Routing + Explainability + Batch Analytics")
 
     with gr.Row():
-        health_md = gr.Markdown(health_panel())
+        health_md = gr.Markdown("### API Status\n- Status: **checking...**")
 
     with gr.Tab("Live Inference"):
         with gr.Row():
@@ -286,6 +286,8 @@ with gr.Blocks(theme=gr.themes.Soft(), css=THEME_CSS, title="Twitter Sentiment H
         cm_df_out = gr.Dataframe(label="Confusion Matrix")
         cm_plot = gr.Plot(label="Confusion Matrix Plot")
         sample_eval = gr.Dataframe(label="Sample predictions")
+
+    demo.load(lambda: health_panel(), outputs=[health_md])
 
     run_btn.click(
         single_predict,

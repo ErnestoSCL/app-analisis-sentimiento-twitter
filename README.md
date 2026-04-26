@@ -27,10 +27,10 @@ Twitter sentiment classification with a **hybrid inference strategy**:
 - **FastAPI**: REST API and interactive OpenAPI docs
 - **Pydantic**: request/response validation
 - **SQLAlchemy 2.x**: ORM and persistence layer
-- **PyMySQL**: MySQL DB driver
+- **PyMySQL** + **cryptography**: MySQL 8 driver with `caching_sha2_password` auth support
 
 ### Frontend / UX
-- **Gradio**: interactive UI with:
+- **Gradio**: full-width interactive UI with:
   - live inference
   - A/B/C compare
   - explainability views
@@ -39,6 +39,7 @@ Twitter sentiment classification with a **hybrid inference strategy**:
 
 ### Infrastructure
 - **Docker** + **Docker Compose**: container orchestration for API, UI, and MySQL
+- MySQL healthcheck ensures API waits for DB to be ready before startup
 
 ---
 
@@ -61,7 +62,7 @@ Twitter sentiment classification with a **hybrid inference strategy**:
 
 ```text
 Gradio UI ---> FastAPI API ---> Hybrid Router ---> Classic Model (TF-IDF + LR)
-                                 |                
+                                 |
                                  +--------------> Transformer (fine-tuned RoBERTa)
                                  |
                                  +--------------> MySQL (prediction logs)
@@ -109,7 +110,7 @@ README.md
 ```powershell
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-set DATABASE_URL=mysql+pymysql://app_user:app_password@localhost:3306/sentiment_app
+$env:DATABASE_URL = "mysql+pymysql://app_user:app_password@localhost:3306/sentiment_app"
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
@@ -117,7 +118,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-set API_BASE_URL=http://localhost:8000
+$env:API_BASE_URL = "http://localhost:8000"
 python ui/gradio_app.py
 ```
 
@@ -132,21 +133,30 @@ python ui/gradio_app.py
 docker compose -f infra/docker-compose.yml up --build
 ```
 
+> On first run or after updating `requirements.txt`, force a clean rebuild:
+> ```powershell
+> docker compose -f infra/docker-compose.yml build --no-cache; docker compose -f infra/docker-compose.yml up
+> ```
+
 Services:
 - API: `http://localhost:8000`
 - Swagger: `http://localhost:8000/docs`
 - UI: `http://localhost:7860`
 - MySQL: `localhost:3306`
 
+The `db` service exposes a healthcheck so the API container only starts once MySQL is accepting connections.
+
 ---
 
 ## Main API Endpoints
 
-- `GET /health`
-- `GET /history`
-- `POST /predict`
-- `POST /predict_compare`
-- `POST /batch_predict`
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | API + model + DB status |
+| `GET` | `/history` | Recent predictions from MySQL |
+| `POST` | `/predict` | Single-text inference |
+| `POST` | `/predict_compare` | Compare all three modes |
+| `POST` | `/batch_predict` | Batch inference |
 
 ### `POST /predict` Example
 
@@ -165,11 +175,7 @@ Services:
 
 ## Batch Error Analysis Input
 
-CSV columns required:
-- `text`
-- `true_label`
-
-Example:
+CSV columns required: `text`, `true_label`
 
 ```csv
 text,true_label
@@ -182,6 +188,6 @@ I went to work,neutral
 
 ## Notes
 
-- Trained model artifacts are expected under `artifacts/models/...`.
+- Trained model artifacts are expected under `artifacts/models/`.
 - Current Docker image runs CPU inference by default.
 - For GPU containers, use a CUDA base image + NVIDIA Container Toolkit.
