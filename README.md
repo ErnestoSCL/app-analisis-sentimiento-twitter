@@ -1,6 +1,6 @@
 # Twitter Sentiment Analysis App (Hybrid AI)
 
-Production-ready Twitter sentiment application with a **hybrid inference strategy**:
+Twitter sentiment classification with a **hybrid inference strategy**:
 
 - **Classic path**: TF-IDF + Logistic Regression (low latency, low cost)
 - **Transformer path**: fine-tuned RoBERTa (higher predictive quality)
@@ -30,7 +30,7 @@ Production-ready Twitter sentiment application with a **hybrid inference strateg
 - **PyMySQL**: MySQL DB driver
 
 ### Frontend / UX
-- **Gradio**: professional interactive UI with:
+- **Gradio**: interactive UI with:
   - live inference
   - A/B/C compare
   - explainability views
@@ -69,7 +69,7 @@ Gradio UI ---> FastAPI API ---> Hybrid Router ---> Classic Model (TF-IDF + LR)
 
 ---
 
-## Professional Project Structure
+## Project Structure
 
 ```text
 app/
